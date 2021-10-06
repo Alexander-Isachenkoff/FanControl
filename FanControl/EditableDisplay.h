@@ -1,12 +1,18 @@
-#include <LiquidCrystal_I2C.h>
+#ifndef EditableDisplay_h
+#define EditableDisplay_h
+
+#include <LCD_1602_RUS.h>
 
 class EditableDisplay
 {
 private:
-    LiquidCrystal_I2C lcd;
-    int mode;
 
-public:    
+protected:
+    int mode;
+    int modesCount;
+    LCD_1602_RUS &lcd;
+
+public:
     void display();
     void editFirst();
     void editNext();
@@ -15,6 +21,8 @@ public:
     void toggleEditing();
     bool isEditing();
     int getMode();
-    EditableDisplay(LiquidCrystal_I2C &);
+    EditableDisplay(LCD_1602_RUS&, int);
     ~EditableDisplay();
 };
+
+#endif
