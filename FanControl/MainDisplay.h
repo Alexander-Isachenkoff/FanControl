@@ -22,6 +22,7 @@ private:
     void printTime(int, int);
     void printDate(int, int, int);
     void printTemp(float);
+    void printWorkMode(int);
 
 public:
     void display(int hours, int minutes, int day, int month, int year, float temp);

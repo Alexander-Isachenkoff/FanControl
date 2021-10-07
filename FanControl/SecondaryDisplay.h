@@ -18,7 +18,7 @@ private:
     int timeOff = 400;
 
 public:
-    void displayTemperatures(int, int);
+    void display(int, int, int);
     SecondaryDisplay(LCD_1602_RUS &);
     ~SecondaryDisplay();
 };

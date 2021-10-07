@@ -7,9 +7,11 @@
 #include "MainDisplay.h"
 #include "SecondaryDisplay.h"
 #include "IR_CODES.h"
+#include "WORK_MODES.h"
 
 #define DS18B20_PORT 2
 #define IR_REC_PORT 6
+#define TEMP_CONTROL_PORT 5
 #define TEMP_UPDATE_TIMEOUT 1000
 #define INIT_ADDR 1023
 #define INIT_KEY 51
@@ -21,13 +23,11 @@ LCD_1602_RUS lcd(0x27, 16, 2);
 DateTime timeNow;
 unsigned long lastTempGetTime;
 float tempFloat;
-int tempRound;
-
 int displayMode = 0;
 bool displayModeChanged = false;
-
 int onTemp;
 int offTemp;
+int workMode = AUTO;
 
 MainDisplay mainDisplay(lcd);
 SecondaryDisplay secondaryDisplay(lcd);
@@ -35,11 +35,7 @@ IRrecv irrecv(IR_REC_PORT);
 decode_results results;
 
 void setup() {
-    pinMode(2, OUTPUT);
-    pinMode(5, OUTPUT);
-
-    Serial.begin(9600);
-
+    pinMode(TEMP_CONTROL_PORT, OUTPUT);    
     if (EEPROM.read(INIT_ADDR) != INIT_KEY) {
         EEPROM.write(INIT_ADDR, INIT_KEY);
         EEPROM.put(0, 40);
@@ -50,6 +46,7 @@ void setup() {
     lcd.init();
     lcd.backlight();
     IrReceiver.begin(IR_REC_PORT, ENABLE_LED_FEEDBACK);
+    Serial.begin(9600);
 }
 
 void loop() {
@@ -58,7 +55,27 @@ void loop() {
         monitor();
     }
     display();
+    controlTemp();
     processCommand();
+}
+
+void controlTemp() {
+    switch (workMode) {
+        case ON:
+            digitalWrite(TEMP_CONTROL_PORT, HIGH);
+            break;
+        case OFF:
+            digitalWrite(TEMP_CONTROL_PORT, LOW);
+            break;
+        case AUTO:
+            if (tempFloat >= onTemp && !digitalRead(TEMP_CONTROL_PORT)) {
+                digitalWrite(TEMP_CONTROL_PORT, HIGH);
+            }
+            if (tempFloat <= offTemp && digitalRead(TEMP_CONTROL_PORT)) {
+                digitalWrite(TEMP_CONTROL_PORT, LOW);
+            }
+            break;
+    }
 }
 
 void processCommand() {
@@ -124,9 +141,38 @@ void processCommand() {
                     }
                 }
                 break;
+
+            case DIGIT_1:
+                workMode = ON;
+                printWorkMode();
+                break;
+            case DIGIT_2:
+                workMode = OFF;
+                printWorkMode();
+                break;
+            case DIGIT_3:
+                workMode = AUTO;
+                printWorkMode();
+                break;
         }
         irrecv.resume();
     }
+}
+
+void printWorkMode() {
+    lcd.clear();
+    switch (workMode) {
+        case ON:
+            lcd.print("ON");
+            break;
+        case OFF:
+            lcd.print("OFF");
+            break;
+        case AUTO:
+            lcd.print("AUTO");
+            break;
+    }
+    delay(1000);
 }
 
 void display() {
@@ -138,7 +184,7 @@ void display() {
         mainDisplay.display((int)rtc.getHours(), (int)rtc.getMinutes(), (int)rtc.getDate(), (int)rtc.getMonth(), (int)rtc.getYear(), tempFloat);
     }
     if (displayMode == 1) {
-        secondaryDisplay.displayTemperatures(onTemp, offTemp);
+        secondaryDisplay.display(onTemp, offTemp, workMode);
     }
 }
 
@@ -182,11 +228,6 @@ void monitor() {
     lastTempGetTime = millis();
     ds18b20_sensor.requestTemp();
     tempFloat = ds18b20_sensor.getTemp();
-    tempRound = round(tempFloat);
-
-    // Serial.println(rtc.getTemperatureFloat());
-    // Serial.println(timeNow.second);
-    // Serial.println(digitalRead(5));
 
     Serial.print("editTimeMode: ");
     Serial.println(mainDisplay.getMode());

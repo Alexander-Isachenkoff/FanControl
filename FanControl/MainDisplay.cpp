@@ -3,7 +3,7 @@
 #include "EditableDisplay.h"
 #include "MainDisplay.h"
 
-const char *months[12] = {
+const char* months[12] = {
     "янв",
     "февр",
     "марта",
@@ -18,8 +18,7 @@ const char *months[12] = {
     "дек",
 };
 
-MainDisplay::MainDisplay(LCD_1602_RUS &lcd) : EditableDisplay(lcd, 5)
-{
+MainDisplay::MainDisplay(LCD_1602_RUS& lcd) : EditableDisplay(lcd, 5) {
     mode = MAIN_BASE_MODE;
 }
 
@@ -86,7 +85,7 @@ void MainDisplay::printDate(int day, int month, int year) {
     } else {
         lcd.print(year);
     }
-    lcd.print(" г.");
+    lcd.print(" г");
 
     for (int i = 0; i < 7 - (dayLength + monthLength); i++) {
         lcd.print(' ');
