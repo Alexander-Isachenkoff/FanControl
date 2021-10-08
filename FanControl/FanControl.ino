@@ -144,14 +144,17 @@ void processCommand() {
 
             case DIGIT_1:
                 workMode = ON;
+                controlTemp();
                 printWorkMode();
                 break;
             case DIGIT_2:
                 workMode = OFF;
+                controlTemp();
                 printWorkMode();
                 break;
             case DIGIT_3:
                 workMode = AUTO;
+                controlTemp();
                 printWorkMode();
                 break;
         }
@@ -184,7 +187,7 @@ void display() {
         mainDisplay.display((int)rtc.getHours(), (int)rtc.getMinutes(), (int)rtc.getDate(), (int)rtc.getMonth(), (int)rtc.getYear(), tempFloat);
     }
     if (displayMode == 1) {
-        secondaryDisplay.display(onTemp, offTemp, workMode);
+        secondaryDisplay.display(onTemp, offTemp, workMode, tempFloat);
     }
 }
 
@@ -228,7 +231,4 @@ void monitor() {
     lastTempGetTime = millis();
     ds18b20_sensor.requestTemp();
     tempFloat = ds18b20_sensor.getTemp();
-
-    Serial.print("editTimeMode: ");
-    Serial.println(mainDisplay.getMode());
 }

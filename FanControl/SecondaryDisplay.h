@@ -18,7 +18,7 @@ private:
     int timeOff = 400;
 
 public:
-    void display(int, int, int);
+    void display(int, int, int, float);
     SecondaryDisplay(LCD_1602_RUS &);
     ~SecondaryDisplay();
 };

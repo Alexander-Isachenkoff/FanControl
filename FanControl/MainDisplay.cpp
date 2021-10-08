@@ -94,7 +94,6 @@ void MainDisplay::printDate(int day, int month, int year) {
 
 void MainDisplay::printTemp(float temp) {
     lcd.setCursor(10, 0);
-    lcd.print(round(temp * 10) / 10.0);
-    lcd.setCursor(14, 0);
+    lcd.print(round(temp * 10) / 10.0, 1);
     lcd.print("°C");
 }

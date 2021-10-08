@@ -6,7 +6,7 @@
 
 #define GRAD "°C"
 
-void SecondaryDisplay::display(int onTemp, int offTemp, int workMode) {
+void SecondaryDisplay::display(int onTemp, int offTemp, int workMode, float temp) {
     lcd.setCursor(0, 0);
     if (mode == ON_TEMP_MODE && millis() % (timeOn + timeOff) > timeOn) {
         lcd.print("    ");
@@ -14,8 +14,7 @@ void SecondaryDisplay::display(int onTemp, int offTemp, int workMode) {
         lcd.print(onTemp);
         lcd.print(GRAD);
     }
-    lcd.setCursor(4, 0);
-    lcd.print(" - ON");
+    lcd.print(" ON");
 
     lcd.setCursor(0, 1);
     if (mode == OFF_TEMP_MODE && millis() % (timeOn + timeOff) > timeOn) {
@@ -24,10 +23,13 @@ void SecondaryDisplay::display(int onTemp, int offTemp, int workMode) {
         lcd.print(offTemp);
         lcd.print(GRAD);
     }
-    lcd.setCursor(4, 1);
-    lcd.print(" - OFF");
+    lcd.print(" OFF");
 
-    lcd.setCursor(12, 0);
+    lcd.setCursor(10, 0);
+    lcd.print(round(temp * 10) / 10.0, 1);
+    lcd.print(GRAD);
+
+    lcd.setCursor(12, 1);
     switch (workMode) {
         case ON:
             lcd.print("  ON");
