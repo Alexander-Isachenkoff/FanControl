@@ -1,7 +1,7 @@
 #include <LCD_1602_RUS.h>
 #include "EditableDisplay.h"
 
-EditableDisplay::EditableDisplay(LCD_1602_RUS &lcd, int modes) : lcd{lcd}
+EditableDisplay::EditableDisplay(LCD_1602_RUS &lcd, byte modes) : lcd{lcd}
 {
     modesCount = modes;
 }
@@ -42,6 +42,6 @@ void EditableDisplay::toggleEditing() {
     }
 }
 
-int EditableDisplay::getMode() {
+byte EditableDisplay::getMode() {
     return mode;
 }

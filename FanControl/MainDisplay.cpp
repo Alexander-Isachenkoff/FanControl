@@ -3,6 +3,8 @@
 #include "EditableDisplay.h"
 #include "MainDisplay.h"
 
+#define SPACE ' '
+
 const char* months[12] = {
     "янв",
     "февр",
@@ -25,6 +27,7 @@ MainDisplay::MainDisplay(LCD_1602_RUS& lcd) : EditableDisplay(lcd, 5) {
 MainDisplay::~MainDisplay() {};
 
 void MainDisplay::display(int hours, int minutes, int day, int month, int year, float temp) {
+    blink = millis() % (timeOn + timeOff) > timeOn;
     MainDisplay::printTime(hours, minutes);
     MainDisplay::printDate(day, month, year);
     MainDisplay::printTemp(temp);
@@ -32,10 +35,10 @@ void MainDisplay::display(int hours, int minutes, int day, int month, int year, 
 
 void MainDisplay::printTime(int hours, int minutes) {
     lcd.setCursor(0, 0);
-    int hourLength = hours < 10 ? 1 : 2;
-    if (getMode() == HOURS_MODE && millis() % (timeOn + timeOff) > timeOn) {
-        for (int i = 0; i < hourLength; i++) {
-            lcd.print(' ');
+    byte hourLength = hours < 10 ? 1 : 2;
+    if (getMode() == HOURS_MODE && blink) {
+        for (byte i = 0; i < hourLength; i++) {
+            lcd.print(SPACE);
         }
     } else {
         lcd.print(hours);
@@ -43,7 +46,7 @@ void MainDisplay::printTime(int hours, int minutes) {
 
     lcd.print(':');
 
-    if (getMode() == MINUTES_MODE && millis() % (timeOn + timeOff) > timeOn) {
+    if (getMode() == MINUTES_MODE && blink) {
         lcd.print("  ");
     } else {
         if (minutes < 10) {
@@ -53,42 +56,42 @@ void MainDisplay::printTime(int hours, int minutes) {
     }
 
     if (hours < 10) {
-        lcd.print(' ');
+        lcd.print(SPACE);
     }
 }
 
 void MainDisplay::printDate(int day, int month, int year) {
     lcd.setCursor(0, 1);
-    int dayLength = day < 10 ? 1 : 2;
-    if (getMode() == DAY_MODE && millis() % (timeOn + timeOff) > timeOn) {
-        for (int i = 0; i < dayLength; i++) {
-            lcd.print(' ');
+    byte dayLength = day < 10 ? 1 : 2;
+    if (getMode() == DAY_MODE && blink) {
+        for (byte i = 0; i < dayLength; i++) {
+            lcd.print(SPACE);
         }
     } else {
         lcd.print(day);
     }
 
-    lcd.print(' ');
+    lcd.print(SPACE);
 
-    int monthLength = strlen(months[month - 1]) / 2;
-    if (getMode() == MONTH_MODE && millis() % (timeOn + timeOff) > timeOn) {
-        for (int i = 0; i < monthLength; i++) {
-            lcd.print(' ');
+    byte monthLength = strlen(months[month - 1]) / 2;
+    if (getMode() == MONTH_MODE && blink) {
+        for (byte i = 0; i < monthLength; i++) {
+            lcd.print(SPACE);
         }
     } else {
         lcd.print(months[month - 1]);
     }
-    lcd.print(' ');
+    lcd.print(SPACE);
 
-    if (getMode() == YEAR_MODE && millis() % (timeOn + timeOff) > timeOn) {
+    if (getMode() == YEAR_MODE && blink) {
         lcd.print("    ");
     } else {
         lcd.print(year);
     }
     lcd.print(" г");
 
-    for (int i = 0; i < 7 - (dayLength + monthLength); i++) {
-        lcd.print(' ');
+    for (byte i = 0; i < 7 - (dayLength + monthLength); i++) {
+        lcd.print(SPACE);
     }
 }
 

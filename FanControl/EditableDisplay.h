@@ -8,8 +8,11 @@ class EditableDisplay
 private:
 
 protected:
-    int mode;
-    int modesCount;
+    const int timeOn = 600;
+    const int timeOff = 400;
+    bool blink;
+    byte mode;
+    byte modesCount;
     LCD_1602_RUS &lcd;
 
 public:
@@ -20,8 +23,8 @@ public:
     void save();
     void toggleEditing();
     bool isEditing();
-    int getMode();
-    EditableDisplay(LCD_1602_RUS&, int);
+    byte getMode();
+    EditableDisplay(LCD_1602_RUS&, byte);
     ~EditableDisplay();
 };
 

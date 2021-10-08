@@ -6,9 +6,11 @@
 
 #define GRAD "°C"
 
-void SecondaryDisplay::display(int onTemp, int offTemp, int workMode, float temp) {
+void SecondaryDisplay::display(int onTemp, int offTemp, byte workMode, float temp) {
+    blink = millis() % (timeOn + timeOff) > timeOn;
+
     lcd.setCursor(0, 0);
-    if (mode == ON_TEMP_MODE && millis() % (timeOn + timeOff) > timeOn) {
+    if (mode == ON_TEMP_MODE && blink) {
         lcd.print("    ");
     } else {
         lcd.print(onTemp);
@@ -17,7 +19,7 @@ void SecondaryDisplay::display(int onTemp, int offTemp, int workMode, float temp
     lcd.print(" ON");
 
     lcd.setCursor(0, 1);
-    if (mode == OFF_TEMP_MODE && millis() % (timeOn + timeOff) > timeOn) {
+    if (mode == OFF_TEMP_MODE && blink) {
         lcd.print("    ");
     } else {
         lcd.print(offTemp);
@@ -43,5 +45,5 @@ void SecondaryDisplay::display(int onTemp, int offTemp, int workMode, float temp
     }
 }
 
-SecondaryDisplay::SecondaryDisplay(LCD_1602_RUS& lcd) : EditableDisplay(lcd, 3) {}
+SecondaryDisplay::SecondaryDisplay(LCD_1602_RUS& lcd) : EditableDisplay(lcd, 2) {}
 SecondaryDisplay::~SecondaryDisplay() {};

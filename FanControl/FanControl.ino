@@ -14,7 +14,9 @@
 #define TEMP_CONTROL_PORT 5
 #define TEMP_UPDATE_TIMEOUT 1000
 #define INIT_ADDR 1023
-#define INIT_KEY 51
+#define INIT_KEY 52
+#define ON_TEMP_ADDR 0
+#define OFF_TEMP_ADDR 1
 
 MicroDS3231 rtc;
 MicroDS18B20<DS18B20_PORT> ds18b20_sensor;
@@ -23,11 +25,11 @@ LCD_1602_RUS lcd(0x27, 16, 2);
 DateTime timeNow;
 unsigned long lastTempGetTime;
 float tempFloat;
-int displayMode = 0;
+bool displayMode = 0;
 bool displayModeChanged = false;
-int onTemp;
-int offTemp;
-int workMode = AUTO;
+byte onTemp;
+byte offTemp;
+byte workMode = AUTO;
 
 MainDisplay mainDisplay(lcd);
 SecondaryDisplay secondaryDisplay(lcd);
@@ -35,14 +37,14 @@ IRrecv irrecv(IR_REC_PORT);
 decode_results results;
 
 void setup() {
-    pinMode(TEMP_CONTROL_PORT, OUTPUT);    
+    pinMode(TEMP_CONTROL_PORT, OUTPUT);
     if (EEPROM.read(INIT_ADDR) != INIT_KEY) {
         EEPROM.write(INIT_ADDR, INIT_KEY);
-        EEPROM.put(0, 40);
-        EEPROM.put(4, 35);
+        EEPROM.put(ON_TEMP_ADDR, 40);
+        EEPROM.put(OFF_TEMP_ADDR, 35);
     }
-    EEPROM.get(0, onTemp);
-    EEPROM.get(4, offTemp);
+    EEPROM.get(ON_TEMP_ADDR, onTemp);
+    EEPROM.get(OFF_TEMP_ADDR, offTemp);
     lcd.init();
     lcd.backlight();
     IrReceiver.begin(IR_REC_PORT, ENABLE_LED_FEEDBACK);
@@ -191,7 +193,7 @@ void display() {
     }
 }
 
-void evalTime(int inc) {
+void evalTime(char inc) {
     switch (mainDisplay.getMode()) {
         case BASE_MODE:
             return;
@@ -214,15 +216,22 @@ void evalTime(int inc) {
     rtc.setTime(timeNow);
 }
 
-void evalTemp(int inc) {
+void evalTemp(char inc) {
+    byte newTemp;
     switch (secondaryDisplay.getMode()) {
         case ON_TEMP_MODE:
-            onTemp += inc;
-            EEPROM.put(0, onTemp);
+            newTemp = onTemp + inc;
+            if (newTemp > offTemp && newTemp < 99) {
+                onTemp = newTemp;
+                EEPROM.put(ON_TEMP_ADDR, onTemp);
+            }
             break;
         case OFF_TEMP_MODE:
-            offTemp += inc;
-            EEPROM.put(4, offTemp);
+            newTemp = offTemp + inc;
+            if (newTemp < onTemp && newTemp > 10) {
+                offTemp = newTemp;
+                EEPROM.put(OFF_TEMP_ADDR, offTemp);
+            }
             break;
     }
 }

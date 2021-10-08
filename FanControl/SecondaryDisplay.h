@@ -14,11 +14,9 @@ enum
 class SecondaryDisplay : public EditableDisplay
 {
 private:
-    int timeOn = 600;
-    int timeOff = 400;
 
 public:
-    void display(int, int, int, float);
+    void display(int, int, byte, float);
     SecondaryDisplay(LCD_1602_RUS &);
     ~SecondaryDisplay();
 };
